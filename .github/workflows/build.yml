@@ -20,8 +20,6 @@ jobs:
         mkdir docs
         echo "Add Training Plan to docs/"
         asciidoctor training-plan.adoc -o docs/training-plan.html
-        echo "Add images to docs/"
-        cp -r img docs/
     - name: Deploy 🚀
       uses: JamesIves/github-pages-deploy-action@releases/v3
       with:
