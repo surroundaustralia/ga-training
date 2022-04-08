@@ -1,0 +1,81 @@
+:sectnums:
+== Training documentation for Geoscience Australia in relation to the Digital Atlas Project
+=== Ontology, Dataset, Feature Collection definitions
+==== Ontologies and associated vocabularies
+- FSDF xxx
+==== Dataset and Feature Collection definitions
+- Floods, ...
+All definitions are written in turtle, and are short enough to be updated manually in the repository as necessary. They are validated against a number of profiles for conformance, as detailed in <<>>.
+
+=== ETL processing
+Design choices:
+
+Python based row processing utilising python pandas, SQLAlchemy to connect to postgres.
+Python's pandas library provides a good wrapper for ingestion of data from a range of relational sources, including Postgres databases as currently used at GA. It is a widely used well supported library. Once read in to a pandas Dataframe (an in memory table), the data may be iterated over row by row with any data manipulation performed using Python functions; for example built in string functions, and geospatial conversion functions through third party libraries such as Shapely. This provides a high degree of flexibility for any necessary data manipulation, including mapping of codes, logic, spelling corrections etc. which can be difficult or expensive operations with other methods. The Python code is readable for new users, and can easily be updated to suit any new requirements, or fix bugs.
+
+RDFLib is utililsed to create valid RDF from each row of data, this ensures no syntax errors are introduced into the RDF graph. The data is serialised using RDFLib, to a set of RDF files.
+
+The output RDF files are then loaded to Jena's persistent database format, TDB2, utilising the tdbloader command line utility. A docker image is used for this, as described in <<Triplestore>> below This completes the ETL process; the data in TDB2 format can be directly read by Jena Fuseki, exposing it through a SPARQL endpoint for querying by Prez (or other applications).
+
+For datasets slightly beyond the limits of in memory processing, SQL limits and offsets may be used. For even larger datasets, alternate strategies should be used such as mapping languages (R2RML), or streamed processing of database dumps. The pros and cons for these methods are not discussed here.
+
+==== Local development, testing
+To make updates to the ETL scripts, the python scripts in `app/processing/{dataset}_block_convert_to_rdf.py` within the https://bitbucket.org/geoscienceaustralia/digital-atlas-etl/src[Digital Atlas ETL repo] should be updated. The changes can then be tested locally by running the python code directly (option 1 below), and inspecting the output. Local integration testing can be performed using Docker Compose, both for the ETL process, and to confirm the output displays correctly in Prez.
+
+Options:
+
+1. Run python script directly, either through the terminal, or an IDE run configuration.
+2. Docker Compose
+_Detailed instructions for these methods of running the ETL process and testing are described in the repository's https://bitbucket.org/geoscienceaustralia/digital-atlas-etl/src/master/readme.md[Readme]_.
+
+==== Cloud based processing
+The ETL Process utilises ECS and EFS when deployed in AWS via Terraform, see <<AWS infrastructure>> and <<Infrastructure management>> below.
+
+=== Display of linked data through a web interface
+==== Web application
+- Surround proprietary code with a license
+- fastapi based
+- direct SPARQL queries to triplestore
+- utilises labels from ontologies, dataset and feature collection definitions and instance data to create the human readable displays in HTML
+- is available on Github and integrated with Docker Hub to build / push new images on updates. Bugs can be reported in Github issues.
+
+==== Triplestore
+- The triplestore used is a combination of three open source Apache Jena related technologies:
+1. Jena (Java triplestore)
+2. TDB2 (Persistent store for Jena)
+3. Fuseki (Webserver providing UI and SPARQL endpoints)
+- Public docker images for Jena and Jena with Fuseki have been created by a Jena user, Stain, and are available on Docker Hub
+- The Jena Fuseki image includes both these components (and the ability to work with TDB2)
+- The Jena image includes a set of TDB2 command line utilities, which can be used to load RDF data to TDB2, and then query/update/delete directly in TDB2. This is the preferred approach for creating large datasets, or performing updates across large numbers of triples.
+
+=== Source code management
+Bitbucket for private code repositories
+Github for public projects
+A small (2MB) container image based on BusyBox to create Jena configs
+
+=== Continuous integration and continuous deployment
+- Bitbucket pipelines for application packaging as docker images, and pushing to container registries.
+- Updates to application processing and API code will be automatically built in to new images and *available* for deployment, however manual deployment is required, in order to facilitate User Acceptance testing prior to deployment.
+Learning Resources:
+bitbucket-piplines.yml file at https://bitbucket.org/geoscienceaustralia/digital-atlas-etl/addon/pipelines/home
+
+=== AWS infrastructure
+ECS services and ECS scheduled tasks are used to run the docker containers.
+
+- Elastic Container Service (ECS) - Runs the docker containers as services (for Prez and Jena) or as one off jobs (ETL processing).
+- Elastic File System (EFS) - provides persistent storage for the docker containers running on ECS.
+- Elastic Load Balancer (ELB) - provides load balancing for the ECS services.
+- Elastic Container Registry (ECR) - provides a registry for the docker images used by the ECS services.
+- Eventbridge - listens for events from xxx to / periodically, triggers the ECS tasks to run.
+- Simple Storage Service (S3) - Data backup.
+Learning resources:
+- AWS documentation
+
+=== Infrastructure management
+Terraform was used as this is the GA infrastructure management tool.
+This contains:
+- AWS infrastructure (ECS, EFS, ELB, ECR, S3)
+- Definitions of the docker images used by the ECS services
+- AWS security groups and rules
+
+Conversion of data from RDF to the
