@@ -16,12 +16,9 @@ jobs:
       run: |
         echo "installing asciidoctor"
         sudo apt-get install asciidoctor ruby -y
+        sudo gem install --pre asciidoctor-pdf
         echo "Making deployment dir - docs/"
         mkdir docs
         echo "Add Training Plan to docs/"
         asciidoctor training-plan.adoc -o docs/training-plan.html
-    - name: Deploy 🚀
-      uses: JamesIves/github-pages-deploy-action@releases/v3
-      with:
-         BRANCH: master
-         FOLDER: docs
+        asciidoctor-pdf training-plan.adoc -o docs/training-plan.pdf
