@@ -438,49 +438,43 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </head>
 <body class="article">
 <div id="header">
+<h1>Training documentation for Geoscience Australia in relation to the Digital Atlas Project</h1>
 </div>
 <div id="content">
 <div class="sect1">
-<h2 id="_training_documentation_for_geoscience_australia_in_relation_to_the_digital_atlas_project">1. Training documentation for Geoscience Australia in relation to the Digital Atlas Project</h2>
+<h2 id="_modelling_ontologies_dataset_and_feature_collection_definitions">1. Modelling, Ontologies, Dataset and Feature Collection definitions</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_ontology_dataset_feature_collection_definitions">1.1. Ontology, Dataset, Feature Collection definitions</h3>
-<div class="sect3">
-<h4 id="_ontologies_and_associated_vocabularies">1.1.1. Ontologies and associated vocabularies</h4>
-<div class="ulist">
-<ul>
-<li>
-<p>FSDF xxx
-==== Dataset and Feature Collection definitions</p>
-</li>
-<li>
-<p>Floods, &#8230;&#8203;
-All definitions are written in turtle, and are short enough to be updated manually in the repository as necessary. They are validated against a number of profiles for conformance, as detailed in &lt;&lt;&gt;&gt;.</p>
-</li>
-</ul>
-</div>
+<h3 id="_ontologies_and_associated_modelling">1.1. Ontologies and associated modelling</h3>
+<div class="paragraph">
+<p>Modelling related to FSDF is in the GA Supermodel, as documented here.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_etl_processing">1.2. ETL processing</h3>
+<h3 id="_feature_collection_and_dataset_definitions">1.2. Feature collection and Dataset definitions</h3>
 <div class="paragraph">
-<p>Design choices:</p>
+<p>Feature collection and dataset definitions are available in the &lt;DA-ETL-Processing repo&gt;</p>
 </div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_etl_processing">2. ETL processing</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_rdf_generation">2.1. RDF generation</h3>
 <div class="paragraph">
 <p>Python based row processing utilising python pandas, SQLAlchemy to connect to postgres.
 Python&#8217;s pandas library provides a good wrapper for ingestion of data from a range of relational sources, including Postgres databases as currently used at GA. It is a widely used well supported library. Once read in to a pandas Dataframe (an in memory table), the data may be iterated over row by row with any data manipulation performed using Python functions; for example built in string functions, and geospatial conversion functions through third party libraries such as Shapely. This provides a high degree of flexibility for any necessary data manipulation, including mapping of codes, logic, spelling corrections etc. which can be difficult or expensive operations with other methods. The Python code is readable for new users, and can easily be updated to suit any new requirements, or fix bugs.</p>
 </div>
 <div class="paragraph">
-<p>RDFLib is utililsed to create valid RDF from each row of data, this ensures no syntax errors are introduced into the RDF graph. The data is serialised using RDFLib, to a set of RDF files.</p>
+<p>RDFLib is utililsed to create valid RDF from each row of data, this ensures no syntax errors are introduced into the RDF graph. The data is serialised using RDFLib, to a set of RDF files. The exception to this is the GeoFabric and GNAF datasets, for which record by record processing is done from database dumps. This is due to the size of these datasets, which could not be loaded in to memory on most desktop computers.</p>
 </div>
 <div class="paragraph">
-<p>The output RDF files are then loaded to Jena&#8217;s persistent database format, TDB2, utilising the tdbloader command line utility. A docker image is used for this, as described in <a href="#_triplestore">Triplestore</a> below This completes the ETL process; the data in TDB2 format can be directly read by Jena Fuseki, exposing it through a SPARQL endpoint for querying by Prez (or other applications).</p>
-</div>
-<div class="paragraph">
-<p>For datasets slightly beyond the limits of in memory processing, SQL limits and offsets may be used. For even larger datasets, alternate strategies should be used such as mapping languages (R2RML), or streamed processing of database dumps. The pros and cons for these methods are not discussed here.</p>
+<p>The ETL scripts are collected in the &lt;digital atlas etl repo&gt;</p>
 </div>
 <div class="sect3">
-<h4 id="_local_development_testing">1.2.1. Local development, testing</h4>
+<h4 id="_local_development_testing">2.1.1. Local development, testing</h4>
 <div class="paragraph">
 <p>To make updates to the ETL scripts, the python scripts in <code>app/processing/{dataset}_block_convert_to_rdf.py</code> within the <a href="https://bitbucket.org/geoscienceaustralia/digital-atlas-etl/src">Digital Atlas ETL repo</a> should be updated. The changes can then be tested locally by running the python code directly (option 1 below), and inspecting the output. Local integration testing can be performed using Docker Compose, both for the ETL process, and to confirm the output displays correctly in Prez.</p>
 </div>
@@ -493,23 +487,132 @@ Python&#8217;s pandas library provides a good wrapper for ingestion of data from
 <p>Run python script directly, either through the terminal, or an IDE run configuration.</p>
 </li>
 <li>
-<p>Docker Compose
+<p>Docker container - allows testing of the processing code only</p>
+</li>
+<li>
+<p>Docker Compose - allows testing of the processing code, loading it to Jena Fuseki, and displaying it through Prez. This facilitates rapid iteration over the processing code, allowing issues to be identified and resolved early in the development process.
 <em>Detailed instructions for these methods of running the ETL process and testing are described in the repository&#8217;s <a href="https://bitbucket.org/geoscienceaustralia/digital-atlas-etl/src/master/readme.md">Readme</a></em>.</p>
 </li>
 </ol>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_cloud_based_processing">1.2.2. Cloud based processing</h4>
+<h4 id="_cloud_based_processing">2.1.2. Cloud based processing</h4>
 <div class="paragraph">
-<p>The ETL Process utilises ECS and EFS when deployed in AWS via Terraform, see <a href="#_aws_infrastructure">AWS infrastructure</a> and <a href="#_infrastructure_management">Infrastructure management</a> below.</p>
+<p>The ETL Process utilises ECS and EFS when deployed in AWS via Terraform, see <a href="#_aws_infrastructure">AWS infrastructure</a> and <a href="#_infrastructure_management">Infrastructure management</a> below. The Terraform script creates a Task Definition for each dataset to be processed, which can be run manually through the AWS console by navigating to "ECS", and finding the relevant task under "Task Definitions". The tasks are configured to write to the S3 Bucket specified using the "OUTPUT_LOCATION" environment variable. This environment variable is currently set in the task definition JSON template (used for all processing tasks), to <code>s3://digital-atlas-rdf</code>. The ECS task has permission to write to this bucket through a statement attached to the <code>ecs_task_definition_role_policy_document</code> data definition in <code>data.tf</code>. The processing code will prepend the <code>DATASET</code> environment variable to the key of each object stored in this bucket, effectively creating a 'folder' structure when viewed through the AWS Console. This structure also allows easy pattern matching when attempting to read specific datasets from S3 to process in to TDB2 datasets, as detailed below.</p>
 </div>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_display_of_linked_data_through_a_web_interface">1.3. Display of linked data through a web interface</h3>
+<h3 id="_tdb2_generation_and_spatial_indexing">2.2. TDB2 generation and spatial indexing</h3>
+<div class="paragraph">
+<p>TDB2 is the second generation on-disk database format utilised by Apache Jena. It provides high scalability, indexation, and works in conjunction with extensions including GeoSPARQL and Full Text Search. TDB2 datasets can be created directly, by utilising the <code>tdb2.tdbloader</code> command line utility packaged with Apache Jena; through the Fuseki UI; or through Assembler files, which are parsed on Jena startup.</p>
+</div>
 <div class="sect3">
-<h4 id="_web_application">1.3.1. Web application</h4>
+<h4 id="_local_development_testing_2">2.2.1. Local development, testing</h4>
+<div class="paragraph">
+<p>To test "end to end" ETL processing, in a similar manner to as it would occur on AWS, it is recommended to utilise the Docker Compose scripts, as the outputs of one container process can be reused in another. This allows the outputs of the RDF generation steps to be loaded (via a common volume) to the TDB2 generation scripts in a dependent docker container. NB the ETL compose file utilise a <code>Jena</code> image, which includes the <code>tdb2.tdbloader</code> command line utility, but does not include the Fuseki UI.</p>
+</div>
+<div class="paragraph">
+<p>Should you wish to test RDF that has already been generated, or is from some source other than the RDF generation scripts, you can directly run the <code>Jena Fuseki</code> container image and create a TDB2 dataset through the Fuseki UI, by going to "manage", then "new dataset". NB This TDB2 dataset will not persist beyond the life of the docker container, unless an external mount or volume has been configured, as docker containers are ephemeral.</p>
+</div>
+<div class="paragraph">
+<p>The Jena spatial index is created through a jar file, repackaged from Apache Jena by Zazuko. This has been added to a multi-stage docker container by Surround, so as to include TDB2 generation along with spatial indexation in one image. This was done as for spatial datasets, the two processes both need to occur, and the output of the TDB2 generation (a TDB2 dataset) is the input of the spatial indexer.</p>
+</div>
+<div class="paragraph">
+<p>In addition to the TDB2 generation and spatial indexation, a prior step is to validate the input data is valid RDF. For clarity, this validation is to determine whether the files are valid RDF, not whether they conform to any profiles (e.g. the OGC Linked Data API profile), meaning the validation will only provide a guarantee that a TDB2 dataset can be created from them, not that the data itself conforms to any useful model. The validation is completed utilising the Apache Jena RIOT command line utility. Surround has written a short bash script which calls the validator on all nquads files which are to be loaded, and should any of them contain any invalid RDF, prints out the problematic lines and errors, and renames the files with an extension of <code>.error</code>. This renaming prevents <code>tdb2.tdbloader</code> attempting to load them to a TDB2 dataset. Successfully validated files will also write a short message confirming their valid format. Should a file fail validation, you should try to identify the problematic code which generated invalid RDF, fix this, and the invalid RDF files (or parts of them, and apply a patch). The TDB2 dataset can either be appended to by re-running processing on just the problematic files, or the whole TDB2 dataset can be regenerated if this is easier.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_cloud_based_processing_2">2.2.2. Cloud based processing</h4>
+<div class="paragraph">
+<p>Task definitions have been created to allow running the TDB2 generation on AWS. This is useful (and arguably necessary) for larger datasets. A task has been created for each TDB2 dataset, which reads data from the relevant RDF Datasets (as RDF files in the output RDF bucket), and writes the output TDB2 dataset to a mounted EFS volume. These are:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 66.6667%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">TDB2 Dataset</th>
+<th class="tableblock halign-left valign-top">RDF Datasets (dcat:Dataset)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">cache</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">power_substations, power_stations, transmission_lines, facilities, placenames, gnaf, asgs, geofabric</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">fsdf</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">power_substations, power_stations, transmission_lines, facilities, placenames</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">gnaf</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">gnaf</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">asgs</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">asgs</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">geofabric</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">geofabric</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>To run the TDB2 generation task on AWS, the task must specify and EFS volume that can be mounted. Either an existing TDB2 dataset can be used, or a new one must be created. These scenarios are described in detail below:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>There is an existing TDB2 dataset on an existing EFS volume which you would like to add additional data to</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Ensure any Jena Fuseki instances currently using the volume are stopped. You can do this by setting the "Desired tasks" count to zero on the relevant "Service" in the <code>ld-digitalatlas-nonprod</code> cluster on AWS.</p>
+</li>
+<li>
+<p>Remove the network mount points for the EFS volume. Go to the EFS homepage in AWS, select the relevant EFS volume (as it already exists, it should be mapped to the relevant TDB2 dataset in the API Terraform) navigate to network, click edit, and remove the mount points.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>A new TDB2 dataset is required, requiring an EFS volume to be created</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Go in to the AWS console (or through the CLI or otherwise) and create an EFS volume in the appropriate region (ap-southeast-2)</p>
+</li>
+<li>
+<p>AWS will automatically generate network mount points, delete these in the console so terraform can create its own network mounts in the right subnets for the task to use. To do this, navigate to network, click edit, and remove the mount points.</p>
+</li>
+</ul>
+</div>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>Specify the EFS volume in the da-etl-terraform repository&#8217;s <code>terraform.tfvars</code> file, under <code>efs_id</code>. This will set the task up to utilise the appropriate volume when deployed. Run Terraform apply, and wait for the changes to propagate.</p>
+</div>
+<div class="paragraph">
+<p>Log in to the AWS console, navigate to EFS, select the relevant EFS volume, and make a note of the Subnet IDs the EFS mount targets are in (under the Network tab).</p>
+</div>
+<div class="paragraph">
+<p>The task can now be run and will mount the correct volume, as specified in Terraform. To run the task, navigate to ECS in the AWS console, click on "Task Definitions", find the relevant task (they are all prepended with "tdb2_generation_*"), select "Deploy" and then "Run task". Select the relevant ECS Cluster (currently figured as <code>da-etl-nonprod</code>), and select only the relevant subnets that you made a note of above. You can now deploy the task.</p>
+</div>
+<div class="paragraph">
+<p>To view the status of the task, click on the task ID, and then click on "logs". It can take a minute for the task to be registered/deployed. Once the task has finished, logs will not be available for viewing under the ECS pages, however logs have been configured to be sent to cloudwatch logs, so they can be viewed here until the retention period ends, currently set to 1 day.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_display_of_linked_data_through_a_web_interface">2.3. Display of linked data through a web interface</h3>
+<div class="sect3">
+<h4 id="_web_application">2.3.1. Web application</h4>
 <div class="ulist">
 <ul>
 <li>
@@ -531,7 +634,7 @@ Python&#8217;s pandas library provides a good wrapper for ingestion of data from
 </div>
 </div>
 <div class="sect3">
-<h4 id="_triplestore">1.3.2. Triplestore</h4>
+<h4 id="_triplestore">2.3.2. Triplestore</h4>
 <div class="ulist">
 <ul>
 <li>
@@ -564,7 +667,7 @@ Python&#8217;s pandas library provides a good wrapper for ingestion of data from
 </div>
 </div>
 <div class="sect2">
-<h3 id="_source_code_management">1.4. Source code management</h3>
+<h3 id="_source_code_management">2.4. Source code management</h3>
 <div class="paragraph">
 <p>Bitbucket for private code repositories
 Github for public projects
@@ -572,7 +675,7 @@ A small (2MB) container image based on BusyBox to create Jena configs</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_continuous_integration_and_continuous_deployment">1.5. Continuous integration and continuous deployment</h3>
+<h3 id="_continuous_integration_and_continuous_deployment">2.5. Continuous integration and continuous deployment</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -587,7 +690,7 @@ bitbucket-piplines.yml file at <a href="https://bitbucket.org/geoscienceaustrali
 </div>
 </div>
 <div class="sect2">
-<h3 id="_aws_infrastructure">1.6. AWS infrastructure</h3>
+<h3 id="_aws_infrastructure">2.6. AWS infrastructure</h3>
 <div class="paragraph">
 <p>ECS services and ECS scheduled tasks are used to run the docker containers.</p>
 </div>
@@ -619,11 +722,11 @@ Learning resources:</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_infrastructure_management">1.7. Infrastructure management</h3>
+<h3 id="_infrastructure_management">2.7. Infrastructure management</h3>
 <div class="paragraph">
 <p>Terraform was used as this is the GA infrastructure management tool.
 This contains:
-- AWS infrastructure (ECS, EFS, ELB, ECR, S3)
+- AWS infrastructure (ECS, EFS, ELB)
 - Definitions of the docker images used by the ECS services
 - AWS security groups and rules</p>
 </div>
@@ -636,7 +739,7 @@ This contains:
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2022-04-08 01:12:19 UTC
+Last updated 2022-06-27 17:18:12 +1000
 </div>
 </div>
 </body>
