@@ -499,7 +499,13 @@ Python&#8217;s pandas library provides a good wrapper for ingestion of data from
 <div class="sect3">
 <h4 id="_cloud_based_processing">2.1.2. Cloud based processing</h4>
 <div class="paragraph">
-<p>The ETL Process utilises ECS and EFS when deployed in AWS via Terraform, see <a href="#_aws_infrastructure">AWS infrastructure</a> and <a href="#_infrastructure_management">Infrastructure management</a> below. The Terraform script creates a Task Definition for each dataset to be processed, which can be run manually through the AWS console by navigating to "ECS", and finding the relevant task under "Task Definitions". The tasks are configured to write to the S3 Bucket specified using the "OUTPUT_LOCATION" environment variable. This environment variable is currently set in the task definition JSON template (used for all processing tasks), to <code>s3://digital-atlas-rdf</code>. The ECS task has permission to write to this bucket through a statement attached to the <code>ecs_task_definition_role_policy_document</code> data definition in <code>data.tf</code>. The processing code will prepend the <code>DATASET</code> environment variable to the key of each object stored in this bucket, effectively creating a 'folder' structure when viewed through the AWS Console. This structure also allows easy pattern matching when attempting to read specific datasets from S3 to process in to TDB2 datasets, as detailed below.</p>
+<p>The ETL Process utilises ECS and EFS when deployed in AWS via Terraform, see <a href="#_aws_infrastructure">AWS infrastructure</a> and <a href="#_infrastructure_management">Infrastructure management</a> below. The Terraform script creates a Task Definition for each dataset to be processed, which can be run manually through the AWS console by navigating to "ECS", and finding the relevant task under "Task Definitions". The tasks are configured to write to the S3 Bucket specified using the "OUTPUT_LOCATION" environment variable. This environment variable is currently set in the task definition JSON template (used for all processing tasks), to <code>s3://digital-atlas-rdf</code>.
+The ECS task has permission to write to this bucket through a statement attached to the <code>ecs_task_definition_role_policy_document</code> data definition in <code>data.tf</code>. The processing code will prepend the <code>DATASET</code> environment variable to the key of each object stored in this bucket, effectively creating a 'folder' structure when viewed through the AWS Console. This structure also allows easy pattern matching when attempting to read specific datasets from S3 to process in to TDB2 datasets, as detailed below. The current contents of the bucket are shown below, with all of the RDF data that has been processed by Surround currently in the bucket:</p>
+</div>
+<div class="imageblock text-center">
+<div class="content">
+<img src="images/aws/s3_digital_atlas_rdf.png" alt="s3_digital_atlas_bucket" width="900">
+</div>
 </div>
 </div>
 </div>
@@ -568,11 +574,11 @@ Python&#8217;s pandas library provides a good wrapper for ingestion of data from
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>There is an existing TDB2 dataset on an existing EFS volume which you would like to add additional data to</p>
+<p>There is an existing TDB2 dataset on an existing EFS volume which you would like to add additional data to. You will need to:</p>
 <div class="ulist">
 <ul>
 <li>
-<p>Ensure any Jena Fuseki instances currently using the volume are stopped. You can do this by setting the "Desired tasks" count to zero on the relevant "Service" in the <code>ld-digitalatlas-nonprod</code> cluster on AWS.</p>
+<p>Ensure any Jena Fuseki instances currently using the volume are stopped. You can do this by setting the "Desired tasks" count to zero on the relevant "Service" in the <code>ld-digitalatlas-nonprod</code> cluster on AWS; and</p>
 </li>
 <li>
 <p>Remove the network mount points for the EFS volume. Go to the EFS homepage in AWS, select the relevant EFS volume (as it already exists, it should be mapped to the relevant TDB2 dataset in the API Terraform) navigate to network, click edit, and remove the mount points.</p>
@@ -581,11 +587,11 @@ Python&#8217;s pandas library provides a good wrapper for ingestion of data from
 </div>
 </li>
 <li>
-<p>A new TDB2 dataset is required, requiring an EFS volume to be created</p>
+<p>A new TDB2 dataset is required, requiring an EFS volume to be created. You will need to:</p>
 <div class="ulist">
 <ul>
 <li>
-<p>Go in to the AWS console (or through the CLI or otherwise) and create an EFS volume in the appropriate region (ap-southeast-2)</p>
+<p>Go in to the AWS console (or through the CLI or otherwise) and create an EFS volume in the appropriate region (ap-southeast-2); and</p>
 </li>
 <li>
 <p>AWS will automatically generate network mount points, delete these in the console so terraform can create its own network mounts in the right subnets for the task to use. To do this, navigate to network, click edit, and remove the mount points.</p>
@@ -596,13 +602,39 @@ Python&#8217;s pandas library provides a good wrapper for ingestion of data from
 </ol>
 </div>
 <div class="paragraph">
+<p>At this point, you should have an EFS volume listed under the EFS File Systems page, as in the screenshot below:</p>
+</div>
+<div class="imageblock text-center">
+<div class="content">
+<img src="images/aws/efs_home.png" alt="EFSHome" width="900">
+</div>
+</div>
+<div class="paragraph">
 <p>Specify the EFS volume in the da-etl-terraform repository&#8217;s <code>terraform.tfvars</code> file, under <code>efs_id</code>. This will set the task up to utilise the appropriate volume when deployed. Run Terraform apply, and wait for the changes to propagate.</p>
 </div>
 <div class="paragraph">
-<p>Log in to the AWS console, navigate to EFS, select the relevant EFS volume, and make a note of the Subnet IDs the EFS mount targets are in (under the Network tab).</p>
+<p>Log in to the AWS console, navigate to EFS, select the relevant EFS volume, and make a note of the Subnet IDs the EFS mount targets are in (under the Network tab), as shown in the screenshot below:</p>
+</div>
+<div class="imageblock text-center">
+<div class="content">
+<img src="images/aws/efs_show_subnets.png" alt="EFSSubnets" width="900">
+</div>
 </div>
 <div class="paragraph">
-<p>The task can now be run and will mount the correct volume, as specified in Terraform. To run the task, navigate to ECS in the AWS console, click on "Task Definitions", find the relevant task (they are all prepended with "tdb2_generation_*"), select "Deploy" and then "Run task". Select the relevant ECS Cluster (currently figured as <code>da-etl-nonprod</code>), and select only the relevant subnets that you made a note of above. You can now deploy the task.</p>
+<p>The task can now be run and will mount the correct volume, as specified in Terraform. To run the task, navigate to ECS in the AWS console, click on "Task Definitions", find the relevant task (they are all prepended with "tdb2_generation_*"), select "Deploy" and then "Run task".</p>
+</div>
+<div class="imageblock text-center">
+<div class="content">
+<img src="images/aws/ecs_etl_task.png" alt="ECSETLTask" width="900">
+</div>
+</div>
+<div class="paragraph">
+<p>Select the relevant ECS Cluster (currently figured as <code>da-etl-nonprod</code>), and select only the relevant subnets that you made a note of above, as shown in the screenshot below:</p>
+</div>
+<div class="imageblock text-center">
+<div class="content">
+<img src="images/aws/ecs_tdb2_task_subnets.png" alt="ECSTaskSubnets" width="900">
+</div>
 </div>
 <div class="paragraph">
 <p>To view the status of the task, click on the task ID, and then click on "logs". It can take a minute for the task to be registered/deployed. Once the task has finished, logs will not be available for viewing under the ECS pages, however logs have been configured to be sent to cloudwatch logs, so they can be viewed here until the retention period ends, currently set to 1 day.</p>
@@ -613,24 +645,24 @@ Python&#8217;s pandas library provides a good wrapper for ingestion of data from
 <h3 id="_display_of_linked_data_through_a_web_interface">2.3. Display of linked data through a web interface</h3>
 <div class="sect3">
 <h4 id="_web_application">2.3.1. Web application</h4>
-<div class="ulist">
-<ul>
+<div class="paragraph">
+<p>The linked data API used for display is a Surround built application, Prez, which is based on FastAPI. FastAPI is an asynchronous web framework written in Python. It suits the task of a linked data API well as regular Python code can be used directly in the functions which generate pages, allowing 'on the fly' manipulation of RDF for presentation in different formats, including HTML for the web. Python&#8217;s RDFLib library is used for any manipulation of RDF prior to display. Data is retrieved from a backend SPARQL endpoint, which in the case of the systems implemented for Geoscience Australia is provided by a Jena Fuseki instance. Prez is a proprietary product that is licensed under <a href="https://github.com/surroundaustralia/Prez/blob/main/LICENSE">BSD-3</a>.</p>
+</div>
+<div class="paragraph">
+<p>The data used by Prez, while all RDF, can be classified in to three categories:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
 <li>
-<p>Surround proprietary code with a license</p>
+<p>Instance data. This is the output of the ETL processing, and includes data at the Feature, Feature Collection, and Dataset level.</p>
 </li>
 <li>
-<p>fastapi based</p>
+<p>Context data. This includes ontologies for the dataset(s), and any related ontologies needed to understand the data, for example the GeoSPARQL ontology. Prez only requires labels and descriptions from these ontologies; though sometimes the entire ontologies are included, as they are small in size and can provide useful context for direct queries to the SPARQL endpoint.</p>
 </li>
-<li>
-<p>direct SPARQL queries to triplestore</p>
-</li>
-<li>
-<p>utilises labels from ontologies, dataset and feature collection definitions and instance data to create the human readable displays in HTML</p>
-</li>
-<li>
-<p>is available on Github and integrated with Docker Hub to build / push new images on updates. Bugs can be reported in Github issues.</p>
-</li>
-</ul>
+</ol>
+</div>
+<div class="paragraph">
+<p>Prez is available as a <a href="https://hub.docker.com/r/surroundaustralia/prez">docker image on dockerhub</a>, and the source code is available on <a href="https://github.com/surroundaustralia/Prez">Github</a>.</p>
 </div>
 </div>
 <div class="sect3">
@@ -668,10 +700,41 @@ Python&#8217;s pandas library provides a good wrapper for ingestion of data from
 </div>
 <div class="sect2">
 <h3 id="_source_code_management">2.4. Source code management</h3>
+<div class="sect3">
+<h4 id="_processing_code_source_data_to_rdf">2.4.1. Processing code (source data to RDF)</h4>
 <div class="paragraph">
-<p>Bitbucket for private code repositories
-Github for public projects
-A small (2MB) container image based on BusyBox to create Jena configs</p>
+<p>The ETL processing code, described in <a href="#_rdf_generation">RDF generation</a>, is available in the <a href="https://bitbucket.org/geoscienceaustralia/digital-atlas-etl/">digital-atlas-etl</a> repository on GA&#8217;s BitBucket. This repository includes a bitbucket pipeline script which automatically builds and pushes a docker image to the <a href="https://ap-southeast-2.console.aws.amazon.com/ecr/repositories/private/049648851863/digital-atlas/etl?region=ap-southeast-2">digital-atlas/etl</a> repository in GA&#8217;s AWS Account.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_tdb2_generation">2.4.2. TDB2 generation</h4>
+<div class="paragraph">
+<p>A multi-stage build docker image is used to generate TDB2 datasets, including a spatial index, as described in <a href="#_tdb2_generation_and_spatial_indexing">TDB2 generation and spatial indexing</a>. This dockerfile is automatically built in a bitbucket pipeline, and the resulting image pushed to the <a href="https://ap-southeast-2.console.aws.amazon.com/ecr/repositories/private/049648851863/tdb-generation?region=ap-southeast-2">tdb-generation</a> repository in GA&#8217;s AWS Account.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_prez">2.4.3. Prez</h4>
+<div class="paragraph">
+<p>Surround Australia maintains Prez through a <a href="https://github.com/surroundaustralia/Prez">github repository</a>. If there are issues with Prez, or feature suggestions, it is recommended to add these as issues to the issue tracker at <a href="https://github.com/surroundaustralia/Prez/issues" class="bare">https://github.com/surroundaustralia/Prez/issues</a>. A suite of unit tests are maintained, including tests for the different endpoints. A docker image is built for each git tagged version (built with tag 'latest'), and versioned images are built when a release is made in Github. We recommend pinning the production version of Prez you use to a particular version, and performing user acceptance testing on any upgrades to Prez prior to utilising these in production.</p>
+</div>
+<div class="paragraph">
+<p>At present, the themes (CSS) and static template pages (jinja templates) made specifically for GA are added in to the base Prez docker image provided by Surround, to produce a "themed" version of Prez. This theming represents a minimal Docker script, available in the <a href="https://bitbucket.org/geoscienceaustralia/ga-themed-prez/src">ga-themed-prez</a> repository. <em>This repository has not yet had the bitbucket pipeline enabled as Surround doesn&#8217;t currently have permission to do so</em></p>
+</div>
+<div class="paragraph">
+<p>In a future release, it is planned to enable dynamic loading of themes at API startup, configured through an environment variable. This will remove the need to build/maintain a separate themed docker image.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_jena_tdb2_generation_spatial_indexation_rdf_validation">2.4.4. Jena (TDB2 generation, spatial indexation, RDF validation)</h4>
+<div class="paragraph">
+<p>Surround has created a docker image which combines the downloading of RDF files from an S3 bucket, RDF validation, TDB2 generation, and Spatial Indexation. This image is in the <a href="https://bitbucket.org/geoscienceaustralia/tdb-generation/">TDB Generation</a> repository. <em>This repository has not yet had the bitbucket pipeline enabled as Surround doesn&#8217;t currently have permission to do so</em></p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_jena_fuseki">2.4.5. Jena Fuseki</h4>
+<div class="paragraph">
+<p>Jena Fuseki includes both Apache Jena, the triplestore, and Fuseki, the frontend web framework including SPARQL endpoint functionality. The version of Jena Fuseki used includes the GeoSPARQL extension. The image used is based on one provided at <a href="https://github.com/zazuko/fuseki-geosparql">Zazuko&#8217;s Fuseki GeoSPARQL Github repository</a>. This image simply downloads the relevant Jena binaries and adds them to a docker image. To this image Surround adds a Jena dataset config, and push the resulting image to the <a href="https://ap-southeast-2.console.aws.amazon.com/ecr/repositories/private/049648851863/fuseki?region=ap-southeast-2">fuseki ECR repository</a>.</p>
+</div>
 </div>
 </div>
 <div class="sect2">
@@ -692,7 +755,8 @@ bitbucket-piplines.yml file at <a href="https://bitbucket.org/geoscienceaustrali
 <div class="sect2">
 <h3 id="_aws_infrastructure">2.6. AWS infrastructure</h3>
 <div class="paragraph">
-<p>ECS services and ECS scheduled tasks are used to run the docker containers.</p>
+<p>A brief description of the AWS resources
+ECS services and ECS tasks are used to run the docker containers.</p>
 </div>
 <div class="ulist">
 <ul>
@@ -703,20 +767,17 @@ bitbucket-piplines.yml file at <a href="https://bitbucket.org/geoscienceaustrali
 <p>Elastic File System (EFS) - provides persistent storage for the docker containers running on ECS.</p>
 </li>
 <li>
-<p>Elastic Load Balancer (ELB) - provides load balancing for the ECS services.</p>
+<p>Elastic Load Balancer (ELB) - provides load balancing and traffic direction for the ECS services.</p>
 </li>
 <li>
 <p>Elastic Container Registry (ECR) - provides a registry for the docker images used by the ECS services.</p>
 </li>
 <li>
-<p>Eventbridge - listens for events from xxx to / periodically, triggers the ECS tasks to run.</p>
-</li>
-<li>
-<p>Simple Storage Service (S3) - Data backup.
+<p>Simple Storage Service (S3) - For storage of RDF and raw data.
 Learning resources:</p>
 </li>
 <li>
-<p>AWS documentation</p>
+<p><a href="https://docs.aws.amazon.com/">AWS documentation</a></p>
 </li>
 </ul>
 </div>
@@ -730,16 +791,13 @@ This contains:
 - Definitions of the docker images used by the ECS services
 - AWS security groups and rules</p>
 </div>
-<div class="paragraph">
-<p>Conversion of data from RDF to the</p>
-</div>
 </div>
 </div>
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2022-06-27 17:18:12 +1000
+Last updated 2022-06-28 23:49:38 +1000
 </div>
 </div>
 </body>
