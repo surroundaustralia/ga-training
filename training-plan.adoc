@@ -2,14 +2,6 @@
 :imagesdir: images
 = Training documentation for Geoscience Australia for the Digital Atlas Project
 
-== Modelling, Ontologies, Dataset and Feature Collection definitions
-
-=== Ontologies and associated modelling
-Modelling related to FSDF is in the GA Supermodel, as documented here.
-
-=== Feature collection and Dataset definitions
-Feature collection and dataset definitions are available in the <DA-ETL-Processing repo>
-
 == ETL processing
 === RDF generation
 
@@ -162,3 +154,11 @@ This contains:
 - AWS infrastructure (ECS, EFS, ELB)
 - Definitions of the docker images used by the ECS services
 - AWS security groups and rules
+
+== Modelling, Ontologies, Dataset and Feature Collection definitions
+
+=== Ontologies and associated modelling
+Modelling related to FSDF is in the GA Supermodel, as documented here.
+
+=== Feature collection and Dataset definitions
+Feature collection and dataset definitions are available in the <DA-ETL-Processing repo>

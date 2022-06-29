@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="generator" content="Asciidoctor 2.0.10">
-<title>Training documentation for Geoscience Australia in relation to the Digital Atlas Project</title>
+<title>Training documentation for Geoscience Australia for the Digital Atlas Project</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
 /* Asciidoctor default stylesheet | MIT License | https://asciidoctor.org */
@@ -438,31 +438,14 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </head>
 <body class="article">
 <div id="header">
-<h1>Training documentation for Geoscience Australia in relation to the Digital Atlas Project</h1>
+<h1>Training documentation for Geoscience Australia for the Digital Atlas Project</h1>
 </div>
 <div id="content">
 <div class="sect1">
-<h2 id="_modelling_ontologies_dataset_and_feature_collection_definitions">1. Modelling, Ontologies, Dataset and Feature Collection definitions</h2>
+<h2 id="_etl_processing">1. ETL processing</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_ontologies_and_associated_modelling">1.1. Ontologies and associated modelling</h3>
-<div class="paragraph">
-<p>Modelling related to FSDF is in the GA Supermodel, as documented here.</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_feature_collection_and_dataset_definitions">1.2. Feature collection and Dataset definitions</h3>
-<div class="paragraph">
-<p>Feature collection and dataset definitions are available in the &lt;DA-ETL-Processing repo&gt;</p>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_etl_processing">2. ETL processing</h2>
-<div class="sectionbody">
-<div class="sect2">
-<h3 id="_rdf_generation">2.1. RDF generation</h3>
+<h3 id="_rdf_generation">1.1. RDF generation</h3>
 <div class="paragraph">
 <p>Python based row processing utilising python pandas, SQLAlchemy to connect to postgres.
 Python&#8217;s pandas library provides a good wrapper for ingestion of data from a range of relational sources, including Postgres databases as currently used at GA. It is a widely used well supported library. Once read in to a pandas Dataframe (an in memory table), the data may be iterated over row by row with any data manipulation performed using Python functions; for example built in string functions, and geospatial conversion functions through third party libraries such as Shapely. This provides a high degree of flexibility for any necessary data manipulation, including mapping of codes, logic, spelling corrections etc. which can be difficult or expensive operations with other methods. The Python code is readable for new users, and can easily be updated to suit any new requirements, or fix bugs.</p>
@@ -474,7 +457,7 @@ Python&#8217;s pandas library provides a good wrapper for ingestion of data from
 <p>The ETL scripts are collected in the &lt;digital atlas etl repo&gt;</p>
 </div>
 <div class="sect3">
-<h4 id="_local_development_testing">2.1.1. Local development, testing</h4>
+<h4 id="_local_development_testing">1.1.1. Local development, testing</h4>
 <div class="paragraph">
 <p>To make updates to the ETL scripts, the python scripts in <code>app/processing/{dataset}_block_convert_to_rdf.py</code> within the <a href="https://bitbucket.org/geoscienceaustralia/digital-atlas-etl/src">Digital Atlas ETL repo</a> should be updated. The changes can then be tested locally by running the python code directly (option 1 below), and inspecting the output. Local integration testing can be performed using Docker Compose, both for the ETL process, and to confirm the output displays correctly in Prez.</p>
 </div>
@@ -497,7 +480,7 @@ Python&#8217;s pandas library provides a good wrapper for ingestion of data from
 </div>
 </div>
 <div class="sect3">
-<h4 id="_cloud_based_processing">2.1.2. Cloud based processing</h4>
+<h4 id="_cloud_based_processing">1.1.2. Cloud based processing</h4>
 <div class="paragraph">
 <p>The ETL Process utilises ECS and EFS when deployed in AWS via Terraform, see <a href="#_aws_infrastructure">AWS infrastructure</a> and <a href="#_infrastructure_management">Infrastructure management</a> below. The Terraform script creates a Task Definition for each dataset to be processed, which can be run manually through the AWS console by navigating to "ECS", and finding the relevant task under "Task Definitions". The tasks are configured to write to the S3 Bucket specified using the "OUTPUT_LOCATION" environment variable. This environment variable is currently set in the task definition JSON template (used for all processing tasks), to <code>s3://digital-atlas-rdf</code>.
 The ECS task has permission to write to this bucket through a statement attached to the <code>ecs_task_definition_role_policy_document</code> data definition in <code>data.tf</code>. The processing code will prepend the <code>DATASET</code> environment variable to the key of each object stored in this bucket, effectively creating a 'folder' structure when viewed through the AWS Console. This structure also allows easy pattern matching when attempting to read specific datasets from S3 to process in to TDB2 datasets, as detailed below. The current contents of the bucket are shown below, with all of the RDF data that has been processed by Surround currently in the bucket:</p>
@@ -510,12 +493,12 @@ The ECS task has permission to write to this bucket through a statement attached
 </div>
 </div>
 <div class="sect2">
-<h3 id="_tdb2_generation_and_spatial_indexing">2.2. TDB2 generation and spatial indexing</h3>
+<h3 id="_tdb2_generation_and_spatial_indexing">1.2. TDB2 generation and spatial indexing</h3>
 <div class="paragraph">
 <p>TDB2 is the second generation on-disk database format utilised by Apache Jena. It provides high scalability, indexation, and works in conjunction with extensions including GeoSPARQL and Full Text Search. TDB2 datasets can be created directly, by utilising the <code>tdb2.tdbloader</code> command line utility packaged with Apache Jena; through the Fuseki UI; or through Assembler files, which are parsed on Jena startup.</p>
 </div>
 <div class="sect3">
-<h4 id="_local_development_testing_2">2.2.1. Local development, testing</h4>
+<h4 id="_local_development_testing_2">1.2.1. Local development, testing</h4>
 <div class="paragraph">
 <p>To test "end to end" ETL processing, in a similar manner to as it would occur on AWS, it is recommended to utilise the Docker Compose scripts, as the outputs of one container process can be reused in another. This allows the outputs of the RDF generation steps to be loaded (via a common volume) to the TDB2 generation scripts in a dependent docker container. NB the ETL compose file utilise a <code>Jena</code> image, which includes the <code>tdb2.tdbloader</code> command line utility, but does not include the Fuseki UI.</p>
 </div>
@@ -530,7 +513,7 @@ The ECS task has permission to write to this bucket through a statement attached
 </div>
 </div>
 <div class="sect3">
-<h4 id="_cloud_based_processing_2">2.2.2. Cloud based processing</h4>
+<h4 id="_cloud_based_processing_2">1.2.2. Cloud based processing</h4>
 <div class="paragraph">
 <p>Task definitions have been created to allow running the TDB2 generation on AWS. This is useful (and arguably necessary) for larger datasets. A task has been created for each TDB2 dataset, which reads data from the relevant RDF Datasets (as RDF files in the output RDF bucket), and writes the output TDB2 dataset to a mounted EFS volume. These are:</p>
 </div>
@@ -642,9 +625,9 @@ The ECS task has permission to write to this bucket through a statement attached
 </div>
 </div>
 <div class="sect2">
-<h3 id="_display_of_linked_data_through_a_web_interface">2.3. Display of linked data through a web interface</h3>
+<h3 id="_display_of_linked_data_through_a_web_interface">1.3. Display of linked data through a web interface</h3>
 <div class="sect3">
-<h4 id="_web_application">2.3.1. Web application</h4>
+<h4 id="_web_application">1.3.1. Web application</h4>
 <div class="paragraph">
 <p>The linked data API used for display is a Surround built application, Prez, which is based on FastAPI. FastAPI is an asynchronous web framework written in Python. It suits the task of a linked data API well as regular Python code can be used directly in the functions which generate pages, allowing 'on the fly' manipulation of RDF for presentation in different formats, including HTML for the web. Python&#8217;s RDFLib library is used for any manipulation of RDF prior to display. Data is retrieved from a backend SPARQL endpoint, which in the case of the systems implemented for Geoscience Australia is provided by a Jena Fuseki instance. Prez is a proprietary product that is licensed under <a href="https://github.com/surroundaustralia/Prez/blob/main/LICENSE">BSD-3</a>.</p>
 </div>
@@ -666,7 +649,7 @@ The ECS task has permission to write to this bucket through a statement attached
 </div>
 </div>
 <div class="sect3">
-<h4 id="_triplestore">2.3.2. Triplestore</h4>
+<h4 id="_triplestore">1.3.2. Triplestore</h4>
 <div class="ulist">
 <ul>
 <li>
@@ -699,21 +682,21 @@ The ECS task has permission to write to this bucket through a statement attached
 </div>
 </div>
 <div class="sect2">
-<h3 id="_source_code_management">2.4. Source code management</h3>
+<h3 id="_source_code_management">1.4. Source code management</h3>
 <div class="sect3">
-<h4 id="_processing_code_source_data_to_rdf">2.4.1. Processing code (source data to RDF)</h4>
+<h4 id="_processing_code_source_data_to_rdf">1.4.1. Processing code (source data to RDF)</h4>
 <div class="paragraph">
 <p>The ETL processing code, described in <a href="#_rdf_generation">RDF generation</a>, is available in the <a href="https://bitbucket.org/geoscienceaustralia/digital-atlas-etl/">digital-atlas-etl</a> repository on GA&#8217;s BitBucket. This repository includes a bitbucket pipeline script which automatically builds and pushes a docker image to the <a href="https://ap-southeast-2.console.aws.amazon.com/ecr/repositories/private/049648851863/digital-atlas/etl?region=ap-southeast-2">digital-atlas/etl</a> repository in GA&#8217;s AWS Account.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_tdb2_generation">2.4.2. TDB2 generation</h4>
+<h4 id="_tdb2_generation">1.4.2. TDB2 generation</h4>
 <div class="paragraph">
 <p>A multi-stage build docker image is used to generate TDB2 datasets, including a spatial index, as described in <a href="#_tdb2_generation_and_spatial_indexing">TDB2 generation and spatial indexing</a>. This dockerfile is automatically built in a bitbucket pipeline, and the resulting image pushed to the <a href="https://ap-southeast-2.console.aws.amazon.com/ecr/repositories/private/049648851863/tdb-generation?region=ap-southeast-2">tdb-generation</a> repository in GA&#8217;s AWS Account.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_prez">2.4.3. Prez</h4>
+<h4 id="_prez">1.4.3. Prez</h4>
 <div class="paragraph">
 <p>Surround Australia maintains Prez through a <a href="https://github.com/surroundaustralia/Prez">github repository</a>. If there are issues with Prez, or feature suggestions, it is recommended to add these as issues to the issue tracker at <a href="https://github.com/surroundaustralia/Prez/issues" class="bare">https://github.com/surroundaustralia/Prez/issues</a>. A suite of unit tests are maintained, including tests for the different endpoints. A docker image is built for each git tagged version (built with tag 'latest'), and versioned images are built when a release is made in Github. We recommend pinning the production version of Prez you use to a particular version, and performing user acceptance testing on any upgrades to Prez prior to utilising these in production.</p>
 </div>
@@ -725,20 +708,20 @@ The ECS task has permission to write to this bucket through a statement attached
 </div>
 </div>
 <div class="sect3">
-<h4 id="_jena_tdb2_generation_spatial_indexation_rdf_validation">2.4.4. Jena (TDB2 generation, spatial indexation, RDF validation)</h4>
+<h4 id="_jena_tdb2_generation_spatial_indexation_rdf_validation">1.4.4. Jena (TDB2 generation, spatial indexation, RDF validation)</h4>
 <div class="paragraph">
 <p>Surround has created a docker image which combines the downloading of RDF files from an S3 bucket, RDF validation, TDB2 generation, and Spatial Indexation. This image is in the <a href="https://bitbucket.org/geoscienceaustralia/tdb-generation/">TDB Generation</a> repository. <em>This repository has not yet had the bitbucket pipeline enabled as Surround doesn&#8217;t currently have permission to do so</em></p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_jena_fuseki">2.4.5. Jena Fuseki</h4>
+<h4 id="_jena_fuseki">1.4.5. Jena Fuseki</h4>
 <div class="paragraph">
 <p>Jena Fuseki includes both Apache Jena, the triplestore, and Fuseki, the frontend web framework including SPARQL endpoint functionality. The version of Jena Fuseki used includes the GeoSPARQL extension. The image used is based on one provided at <a href="https://github.com/zazuko/fuseki-geosparql">Zazuko&#8217;s Fuseki GeoSPARQL Github repository</a>. This image simply downloads the relevant Jena binaries and adds them to a docker image. To this image Surround adds a Jena dataset config, and push the resulting image to the <a href="https://ap-southeast-2.console.aws.amazon.com/ecr/repositories/private/049648851863/fuseki?region=ap-southeast-2">fuseki ECR repository</a>.</p>
 </div>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_continuous_integration_and_continuous_deployment">2.5. Continuous integration and continuous deployment</h3>
+<h3 id="_continuous_integration_and_continuous_deployment">1.5. Continuous integration and continuous deployment</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -753,7 +736,7 @@ bitbucket-piplines.yml file at <a href="https://bitbucket.org/geoscienceaustrali
 </div>
 </div>
 <div class="sect2">
-<h3 id="_aws_infrastructure">2.6. AWS infrastructure</h3>
+<h3 id="_aws_infrastructure">1.6. AWS infrastructure</h3>
 <div class="paragraph">
 <p>A brief description of the AWS resources
 ECS services and ECS tasks are used to run the docker containers.</p>
@@ -783,7 +766,7 @@ Learning resources:</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_infrastructure_management">2.7. Infrastructure management</h3>
+<h3 id="_infrastructure_management">1.7. Infrastructure management</h3>
 <div class="paragraph">
 <p>Terraform was used as this is the GA infrastructure management tool.
 This contains:
@@ -794,10 +777,27 @@ This contains:
 </div>
 </div>
 </div>
+<div class="sect1">
+<h2 id="_modelling_ontologies_dataset_and_feature_collection_definitions">2. Modelling, Ontologies, Dataset and Feature Collection definitions</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_ontologies_and_associated_modelling">2.1. Ontologies and associated modelling</h3>
+<div class="paragraph">
+<p>Modelling related to FSDF is in the GA Supermodel, as documented here.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_feature_collection_and_dataset_definitions">2.2. Feature collection and Dataset definitions</h3>
+<div class="paragraph">
+<p>Feature collection and dataset definitions are available in the &lt;DA-ETL-Processing repo&gt;</p>
+</div>
+</div>
+</div>
+</div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2022-06-28 23:49:38 +1000
+Last updated 2022-06-29 11:14:26 +1000
 </div>
 </div>
 </body>
