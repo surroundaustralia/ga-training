@@ -18,7 +18,7 @@ jobs:
         sudo apt-get install asciidoctor ruby -y
         sudo gem install --pre asciidoctor-pdf
         echo "Making deployment dir - docs/"
-        mkdir docs
         echo "Add Training Plan to docs/"
         asciidoctor training-plan.adoc -o docs/training-plan.html
         asciidoctor-pdf training-plan.adoc -o docs/training-plan.pdf
+        cp images -r docs
