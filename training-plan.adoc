@@ -2,6 +2,8 @@
 :imagesdir: images
 = Training documentation for Geoscience Australia for the Digital Atlas Project
 
+_This training documentation is automatically built in a *Github Action* and deployed to https://surroundaustralia.github.io/ga-training/training-plan.html - commits to bitbucket will not update the online documentation._
+
 == ETL processing
 === RDF generation
 
@@ -10,7 +12,7 @@ Python's pandas library provides a good wrapper for ingestion of data from a ran
 
 RDFLib is utililsed to create valid RDF from each row of data, this ensures no syntax errors are introduced into the RDF graph. The data is serialised using RDFLib, to a set of RDF files. The exception to this is the GeoFabric and GNAF datasets, for which record by record processing is done from database dumps. This is due to the size of these datasets, which could not be loaded in to memory on most desktop computers.
 
-The ETL scripts are collected in the <digital atlas etl repo>
+The ETL scripts are collected in the https://bitbucket.org/geoscienceaustralia/digital-atlas-etl/src[Digital Atlas ETL repo]
 
 ==== Local development, testing
 To make updates to the ETL scripts, the python scripts in `app/processing/{dataset}_block_convert_to_rdf.py` within the https://bitbucket.org/geoscienceaustralia/digital-atlas-etl/src[Digital Atlas ETL repo] should be updated. The changes can then be tested locally by running the python code directly (option 1 below), and inspecting the output. Local integration testing can be performed using Docker Compose, both for the ETL process, and to confirm the output displays correctly in Prez.
@@ -149,16 +151,15 @@ Learning resources:
 - https://docs.aws.amazon.com/[AWS documentation]
 
 === Infrastructure management
-Terraform was used as this is the GA infrastructure management tool.
-This contains:
-- AWS infrastructure (ECS, EFS, ELB)
-- Definitions of the docker images used by the ECS services
-- AWS security groups and rules
+Terraform was used as this is the preferred GA infrastructure management tool.
+Two git repositories were used to set up separate terraform stacks. One stack was created for ETL, containing "static" task definitions which can be run on demand, and a second for Prez/Fuseki, which defines these as an ECS service, meaning they run continuously as containerised applications on AWS.
+
+These repositories are at:
+
+1. https://bitbucket.org/geoscienceaustralia/da-etl-terraform[Terraform ETL on GA's Bitbucket]
+2. https://bitbucket.org/geoscienceaustralia/da-api-terraform[Terraform API on GA's Bitbucket]
 
 == Modelling, Ontologies, Dataset and Feature Collection definitions
+The FSDF supermodel documentation is in Geoscience Australia's Github at https://geoscienceaustralia.github.io/fsdf-supermodel/supermodel.html[FSDF Supermodel].
 
-=== Ontologies and associated modelling
-Modelling related to FSDF is in the GA Supermodel, as documented here.
-
-=== Feature collection and Dataset definitions
-Feature collection and dataset definitions are available in the <DA-ETL-Processing repo>
+Ontologies, dataset, and feature collection definitions are available in RDF, as turtle, in the https://bitbucket.org/geoscienceaustralia/digital-atlas-etl/src[Digital Atlas ETL repo]. Note the FSDF ontology covers a number of FSDF datasets, which do not require their own ontology.
