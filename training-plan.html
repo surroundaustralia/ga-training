@@ -441,6 +441,13 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <h1>Training documentation for Geoscience Australia for the Digital Atlas Project</h1>
 </div>
 <div id="content">
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p><em>This training documentation is automatically built in a <strong>Github Action</strong> and deployed to <a href="https://surroundaustralia.github.io/ga-training/training-plan.html" class="bare">https://surroundaustralia.github.io/ga-training/training-plan.html</a> - commits to bitbucket will not update the online documentation.</em></p>
+</div>
+</div>
+</div>
 <div class="sect1">
 <h2 id="_etl_processing">1. ETL processing</h2>
 <div class="sectionbody">
@@ -454,7 +461,7 @@ Python&#8217;s pandas library provides a good wrapper for ingestion of data from
 <p>RDFLib is utililsed to create valid RDF from each row of data, this ensures no syntax errors are introduced into the RDF graph. The data is serialised using RDFLib, to a set of RDF files. The exception to this is the GeoFabric and GNAF datasets, for which record by record processing is done from database dumps. This is due to the size of these datasets, which could not be loaded in to memory on most desktop computers.</p>
 </div>
 <div class="paragraph">
-<p>The ETL scripts are collected in the &lt;digital atlas etl repo&gt;</p>
+<p>The ETL scripts are collected in the <a href="https://bitbucket.org/geoscienceaustralia/digital-atlas-etl/src">Digital Atlas ETL repo</a></p>
 </div>
 <div class="sect3">
 <h4 id="_local_development_testing">1.1.1. Local development, testing</h4>
@@ -768,11 +775,21 @@ Learning resources:</p>
 <div class="sect2">
 <h3 id="_infrastructure_management">1.7. Infrastructure management</h3>
 <div class="paragraph">
-<p>Terraform was used as this is the GA infrastructure management tool.
-This contains:
-- AWS infrastructure (ECS, EFS, ELB)
-- Definitions of the docker images used by the ECS services
-- AWS security groups and rules</p>
+<p>Terraform was used as this is the preferred GA infrastructure management tool.
+Two git repositories were used to set up separate terraform stacks. One stack was created for ETL, containing "static" task definitions which can be run on demand, and a second for Prez/Fuseki, which defines these as an ECS service, meaning they run continuously as containerised applications on AWS.</p>
+</div>
+<div class="paragraph">
+<p>These repositories are at:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><a href="https://bitbucket.org/geoscienceaustralia/da-etl-terraform">Terraform ETL on GA&#8217;s Bitbucket</a></p>
+</li>
+<li>
+<p><a href="https://bitbucket.org/geoscienceaustralia/da-api-terraform">Terraform API on GA&#8217;s Bitbucket</a></p>
+</li>
+</ol>
 </div>
 </div>
 </div>
@@ -780,24 +797,18 @@ This contains:
 <div class="sect1">
 <h2 id="_modelling_ontologies_dataset_and_feature_collection_definitions">2. Modelling, Ontologies, Dataset and Feature Collection definitions</h2>
 <div class="sectionbody">
-<div class="sect2">
-<h3 id="_ontologies_and_associated_modelling">2.1. Ontologies and associated modelling</h3>
 <div class="paragraph">
-<p>Modelling related to FSDF is in the GA Supermodel, as documented here.</p>
+<p>The FSDF supermodel documentation is in Geoscience Australia&#8217;s Github at <a href="https://geoscienceaustralia.github.io/fsdf-supermodel/supermodel.html">FSDF Supermodel</a>.</p>
 </div>
-</div>
-<div class="sect2">
-<h3 id="_feature_collection_and_dataset_definitions">2.2. Feature collection and Dataset definitions</h3>
 <div class="paragraph">
-<p>Feature collection and dataset definitions are available in the &lt;DA-ETL-Processing repo&gt;</p>
-</div>
+<p>Ontologies, dataset, and feature collection definitions are available in RDF, as turtle, in the <a href="https://bitbucket.org/geoscienceaustralia/digital-atlas-etl/src">Digital Atlas ETL repo</a>. Note the FSDF ontology covers a number of FSDF datasets, which do not require their own ontology.</p>
 </div>
 </div>
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2022-07-12 05:22:49 UTC
+Last updated 2022-07-20 00:41:37 UTC
 </div>
 </div>
 </body>
