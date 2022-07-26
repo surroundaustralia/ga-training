@@ -449,10 +449,243 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </div>
 </div>
 <div class="sect1">
-<h2 id="_etl_processing">1. ETL processing</h2>
+<h2 id="_architecture">1. Architecture</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_rdf_generation">1.1. RDF generation</h3>
+<h3 id="_application_and_data">1.1. Application and Data</h3>
+<div class="paragraph">
+<p>The following diagram depicts the architecture for data from source to presentation in the various APIs, along with the different configurations currently set up. The source data varies between datasets, and has not been expanded in this diagram. For the Small Datasets, it is a Postgres instance; and for the other datasets it is shapefiles downloaded from government websites, and hosted on S3 buckets.</p>
+</div>
+<div class="imageblock text-center">
+<div class="content">
+<img src="images/architecture-application-and-data.png" alt="arch-app-data" width="900">
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_infrastructure_and_automation">1.2. Infrastructure and Automation</h3>
+<div class="paragraph">
+<p>The following diagram depicts the architecture from an infrastructure and automation perspective. The six main code repositories used for the project are shown, along with CI pipelines to build and push images to Amazon Elastic Container Registry. The key infrastructure components are shown on the lower half, with boxes showing the Terraform scripts that define these components. EFS is manually mounted first to the ETL processing, then switched to the API instances.</p>
+</div>
+<div class="imageblock text-center">
+<div class="content">
+<img src="images/architecture-infrastructure-and-automation.png" alt="arch-infra-auto" width="900">
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_dataset_overview">2. Dataset overview</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The tables below summarise the Datasets and Feature Collections in FSDF that have been processed, along with counts of Features within these. GNAF, Geofabric, and ASGS have also been included for context.</p>
+</div>
+<div class="sect2">
+<h3 id="_fsdf">2.1. FSDF</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 16.6666%;">
+<col style="width: 33.3333%;">
+<col style="width: 50.0001%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Dataset</th>
+<th class="tableblock halign-left valign-top">Feature Collection</th>
+<th class="tableblock halign-left valign-top">Feature Count</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Facilities</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Medical</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">7,123</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Facilities</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Emergency Management</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">8,901</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Facilities</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Education</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">26,403</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Electrical Infrastructure</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Power Substations</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1,101</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Electrical Infrastructure</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Transmission Lines</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2,461</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Electrical Infrastructure</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Power Stations</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">536</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Placenames</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Places</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">287,338</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="_other_government_datasets">2.2. Other government datasets</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 16.6666%;">
+<col style="width: 33.3333%;">
+<col style="width: 50.0001%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Dataset</th>
+<th class="tableblock halign-left valign-top">Feature Collection</th>
+<th class="tableblock halign-left valign-top">Feature Count</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Australian Statistical Geography Standard (ASGS) Edition 3</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Australia</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Australian Statistical Geography Standard (ASGS) Edition 3</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">States &amp; Territories</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">10</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Australian Statistical Geography Standard (ASGS) Edition 3</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Australian Drainage Divisions</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">17</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Australian Statistical Geography Standard (ASGS) Edition 3</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Greater Capital City Statistical Areas</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">35</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Australian Statistical Geography Standard (ASGS) Edition 3</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Indigenous Regions</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">59</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Australian Statistical Geography Standard (ASGS) Edition 3</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Tourism Regions</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">76</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Australian Statistical Geography Standard (ASGS) Edition 3</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Statistical Areas Level 4</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">108</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Australian Statistical Geography Standard (ASGS) Edition 3</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Commonwealth Electoral Division 2021</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">170</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Australian Statistical Geography Standard (ASGS) Edition 3</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Statistical Areas Level 3</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">359</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Australian Statistical Geography Standard (ASGS) Edition 3</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Indigenous Areas</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">431</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Australian Statistical Geography Standard (ASGS) Edition 3</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">State Electoral Division 2021</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">452</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Australian Statistical Geography Standard (ASGS) Edition 3</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Local Government Area 2021</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">566</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Australian Statistical Geography Standard (ASGS) Edition 3</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Indigenous Locations</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1,139</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Australian Statistical Geography Standard (ASGS) Edition 3</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Statistical Areas Level 2</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2,473</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Australian Statistical Geography Standard (ASGS) Edition 3</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Postal Area</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2,644</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Australian Statistical Geography Standard (ASGS) Edition 3</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Destination Zones</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">9,329</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Australian Statistical Geography Standard (ASGS) Edition 3</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Suburbs and Localities</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">15,353</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Australian Statistical Geography Standard (ASGS) Edition 3</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Statistical Areas Level 1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">61,845</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Australian Statistical Geography Standard (ASGS) Edition 3</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Mesh Block</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">368,286</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Australian Hydrological Geospatial Fabric</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Drainage Divisions</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">13</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Australian Hydrological Geospatial Fabric</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">River Regions</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">219</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Australian Hydrological Geospatial Fabric</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Contracted Catchments</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">194,053</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Geocoded National Address File</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Street Locality</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">734,292</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Geocoded National Address File</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Address Site</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">15,411,809</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Geocoded National Address File</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Addresses</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">15,929,362</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_etl_processing">3. ETL processing</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_rdf_generation">3.1. RDF generation</h3>
 <div class="paragraph">
 <p>Python based row processing utilising python pandas, SQLAlchemy to connect to postgres.
 Python&#8217;s pandas library provides a good wrapper for ingestion of data from a range of relational sources, including Postgres databases as currently used at GA. It is a widely used well supported library. Once read in to a pandas Dataframe (an in memory table), the data may be iterated over row by row with any data manipulation performed using Python functions; for example built in string functions, and geospatial conversion functions through third party libraries such as Shapely. This provides a high degree of flexibility for any necessary data manipulation, including mapping of codes, logic, spelling corrections etc. which can be difficult or expensive operations with other methods. The Python code is readable for new users, and can easily be updated to suit any new requirements, or fix bugs.</p>
@@ -464,7 +697,7 @@ Python&#8217;s pandas library provides a good wrapper for ingestion of data from
 <p>The ETL scripts are collected in the <a href="https://bitbucket.org/geoscienceaustralia/digital-atlas-etl/src">Digital Atlas ETL repo</a></p>
 </div>
 <div class="sect3">
-<h4 id="_local_development_testing">1.1.1. Local development, testing</h4>
+<h4 id="_local_development_testing">3.1.1. Local development, testing</h4>
 <div class="paragraph">
 <p>To make updates to the ETL scripts, the python scripts in <code>app/processing/{dataset}_block_convert_to_rdf.py</code> within the <a href="https://bitbucket.org/geoscienceaustralia/digital-atlas-etl/src">Digital Atlas ETL repo</a> should be updated. The changes can then be tested locally by running the python code directly (option 1 below), and inspecting the output. Local integration testing can be performed using Docker Compose, both for the ETL process, and to confirm the output displays correctly in Prez.</p>
 </div>
@@ -487,7 +720,7 @@ Python&#8217;s pandas library provides a good wrapper for ingestion of data from
 </div>
 </div>
 <div class="sect3">
-<h4 id="_cloud_based_processing">1.1.2. Cloud based processing</h4>
+<h4 id="_cloud_based_processing">3.1.2. Cloud based processing</h4>
 <div class="paragraph">
 <p>The ETL Process utilises ECS and EFS when deployed in AWS via Terraform, see <a href="#_aws_infrastructure">AWS infrastructure</a> and <a href="#_infrastructure_management">Infrastructure management</a> below. The Terraform script creates a Task Definition for each dataset to be processed, which can be run manually through the AWS console by navigating to "ECS", and finding the relevant task under "Task Definitions". The tasks are configured to write to the S3 Bucket specified using the "OUTPUT_LOCATION" environment variable. This environment variable is currently set in the task definition JSON template (used for all processing tasks), to <code>s3://digital-atlas-rdf</code>.
 The ECS task has permission to write to this bucket through a statement attached to the <code>ecs_task_definition_role_policy_document</code> data definition in <code>data.tf</code>. The processing code will prepend the <code>DATASET</code> environment variable to the key of each object stored in this bucket, effectively creating a 'folder' structure when viewed through the AWS Console. This structure also allows easy pattern matching when attempting to read specific datasets from S3 to process in to TDB2 datasets, as detailed below. The current contents of the bucket are shown below, with all of the RDF data that has been processed by Surround currently in the bucket:</p>
@@ -500,12 +733,12 @@ The ECS task has permission to write to this bucket through a statement attached
 </div>
 </div>
 <div class="sect2">
-<h3 id="_tdb2_generation_and_spatial_indexing">1.2. TDB2 generation and spatial indexing</h3>
+<h3 id="_tdb2_generation_and_spatial_indexing">3.2. TDB2 generation and spatial indexing</h3>
 <div class="paragraph">
 <p>TDB2 is the second generation on-disk database format utilised by Apache Jena. It provides high scalability, indexation, and works in conjunction with extensions including GeoSPARQL and Full Text Search. TDB2 datasets can be created directly, by utilising the <code>tdb2.tdbloader</code> command line utility packaged with Apache Jena; through the Fuseki UI; or through Assembler files, which are parsed on Jena startup.</p>
 </div>
 <div class="sect3">
-<h4 id="_local_development_testing_2">1.2.1. Local development, testing</h4>
+<h4 id="_local_development_testing_2">3.2.1. Local development, testing</h4>
 <div class="paragraph">
 <p>To test "end to end" ETL processing, in a similar manner to as it would occur on AWS, it is recommended to utilise the Docker Compose scripts, as the outputs of one container process can be reused in another. This allows the outputs of the RDF generation steps to be loaded (via a common volume) to the TDB2 generation scripts in a dependent docker container. NB the ETL compose file utilise a <code>Jena</code> image, which includes the <code>tdb2.tdbloader</code> command line utility, but does not include the Fuseki UI.</p>
 </div>
@@ -520,7 +753,7 @@ The ECS task has permission to write to this bucket through a statement attached
 </div>
 </div>
 <div class="sect3">
-<h4 id="_cloud_based_processing_2">1.2.2. Cloud based processing</h4>
+<h4 id="_cloud_based_processing_2">3.2.2. Cloud based processing</h4>
 <div class="paragraph">
 <p>Task definitions have been created to allow running the TDB2 generation on AWS. This is useful (and arguably necessary) for larger datasets. A task has been created for each TDB2 dataset, which reads data from the relevant RDF Datasets (as RDF files in the output RDF bucket), and writes the output TDB2 dataset to a mounted EFS volume. These are:</p>
 </div>
@@ -632,9 +865,9 @@ The ECS task has permission to write to this bucket through a statement attached
 </div>
 </div>
 <div class="sect2">
-<h3 id="_display_of_linked_data_through_a_web_interface">1.3. Display of linked data through a web interface</h3>
+<h3 id="_display_of_linked_data_through_a_web_interface">3.3. Display of linked data through a web interface</h3>
 <div class="sect3">
-<h4 id="_web_application">1.3.1. Web application</h4>
+<h4 id="_web_application">3.3.1. Web application</h4>
 <div class="paragraph">
 <p>The linked data API used for display is a Surround built application, Prez, which is based on FastAPI. FastAPI is an asynchronous web framework written in Python. It suits the task of a linked data API well as regular Python code can be used directly in the functions which generate pages, allowing 'on the fly' manipulation of RDF for presentation in different formats, including HTML for the web. Python&#8217;s RDFLib library is used for any manipulation of RDF prior to display. Data is retrieved from a backend SPARQL endpoint, which in the case of the systems implemented for Geoscience Australia is provided by a Jena Fuseki instance. Prez is a proprietary product that is licensed under <a href="https://github.com/surroundaustralia/Prez/blob/main/LICENSE">BSD-3</a>.</p>
 </div>
@@ -656,7 +889,7 @@ The ECS task has permission to write to this bucket through a statement attached
 </div>
 </div>
 <div class="sect3">
-<h4 id="_triplestore">1.3.2. Triplestore</h4>
+<h4 id="_triplestore">3.3.2. Triplestore</h4>
 <div class="ulist">
 <ul>
 <li>
@@ -689,21 +922,21 @@ The ECS task has permission to write to this bucket through a statement attached
 </div>
 </div>
 <div class="sect2">
-<h3 id="_source_code_management">1.4. Source code management</h3>
+<h3 id="_source_code_management">3.4. Source code management</h3>
 <div class="sect3">
-<h4 id="_processing_code_source_data_to_rdf">1.4.1. Processing code (source data to RDF)</h4>
+<h4 id="_processing_code_source_data_to_rdf">3.4.1. Processing code (source data to RDF)</h4>
 <div class="paragraph">
 <p>The ETL processing code, described in <a href="#_rdf_generation">RDF generation</a>, is available in the <a href="https://bitbucket.org/geoscienceaustralia/digital-atlas-etl/">digital-atlas-etl</a> repository on GA&#8217;s BitBucket. This repository includes a bitbucket pipeline script which automatically builds and pushes a docker image to the <a href="https://ap-southeast-2.console.aws.amazon.com/ecr/repositories/private/049648851863/digital-atlas/etl?region=ap-southeast-2">digital-atlas/etl</a> repository in GA&#8217;s AWS Account.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_tdb2_generation">1.4.2. TDB2 generation</h4>
+<h4 id="_tdb2_generation">3.4.2. TDB2 generation</h4>
 <div class="paragraph">
 <p>A multi-stage build docker image is used to generate TDB2 datasets, including a spatial index, as described in <a href="#_tdb2_generation_and_spatial_indexing">TDB2 generation and spatial indexing</a>. This dockerfile is automatically built in a bitbucket pipeline, and the resulting image pushed to the <a href="https://ap-southeast-2.console.aws.amazon.com/ecr/repositories/private/049648851863/tdb-generation?region=ap-southeast-2">tdb-generation</a> repository in GA&#8217;s AWS Account.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_prez">1.4.3. Prez</h4>
+<h4 id="_prez">3.4.3. Prez</h4>
 <div class="paragraph">
 <p>Surround Australia maintains Prez through a <a href="https://github.com/surroundaustralia/Prez">github repository</a>. If there are issues with Prez, or feature suggestions, it is recommended to add these as issues to the issue tracker at <a href="https://github.com/surroundaustralia/Prez/issues" class="bare">https://github.com/surroundaustralia/Prez/issues</a>. A suite of unit tests are maintained, including tests for the different endpoints. A docker image is built for each git tagged version (built with tag 'latest'), and versioned images are built when a release is made in Github. We recommend pinning the production version of Prez you use to a particular version, and performing user acceptance testing on any upgrades to Prez prior to utilising these in production.</p>
 </div>
@@ -715,20 +948,20 @@ The ECS task has permission to write to this bucket through a statement attached
 </div>
 </div>
 <div class="sect3">
-<h4 id="_jena_tdb2_generation_spatial_indexation_rdf_validation">1.4.4. Jena (TDB2 generation, spatial indexation, RDF validation)</h4>
+<h4 id="_jena_tdb2_generation_spatial_indexation_rdf_validation">3.4.4. Jena (TDB2 generation, spatial indexation, RDF validation)</h4>
 <div class="paragraph">
 <p>Surround has created a docker image which combines the downloading of RDF files from an S3 bucket, RDF validation, TDB2 generation, and Spatial Indexation. This image is in the <a href="https://bitbucket.org/geoscienceaustralia/tdb-generation/">TDB Generation</a> repository. <em>This repository has not yet had the bitbucket pipeline enabled as Surround doesn&#8217;t currently have permission to do so</em></p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_jena_fuseki">1.4.5. Jena Fuseki</h4>
+<h4 id="_jena_fuseki">3.4.5. Jena Fuseki</h4>
 <div class="paragraph">
 <p>Jena Fuseki includes both Apache Jena, the triplestore, and Fuseki, the frontend web framework including SPARQL endpoint functionality. The version of Jena Fuseki used includes the GeoSPARQL extension. The image used is based on one provided at <a href="https://github.com/zazuko/fuseki-geosparql">Zazuko&#8217;s Fuseki GeoSPARQL Github repository</a>. This image simply downloads the relevant Jena binaries and adds them to a docker image. To this image Surround adds a Jena dataset config, and push the resulting image to the <a href="https://ap-southeast-2.console.aws.amazon.com/ecr/repositories/private/049648851863/fuseki?region=ap-southeast-2">fuseki ECR repository</a>.</p>
 </div>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_continuous_integration_and_continuous_deployment">1.5. Continuous integration and continuous deployment</h3>
+<h3 id="_continuous_integration_and_continuous_deployment">3.5. Continuous integration and continuous deployment</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -743,7 +976,7 @@ bitbucket-piplines.yml file at <a href="https://bitbucket.org/geoscienceaustrali
 </div>
 </div>
 <div class="sect2">
-<h3 id="_aws_infrastructure">1.6. AWS infrastructure</h3>
+<h3 id="_aws_infrastructure">3.6. AWS infrastructure</h3>
 <div class="paragraph">
 <p>A brief description of the AWS resources
 ECS services and ECS tasks are used to run the docker containers.</p>
@@ -773,7 +1006,7 @@ Learning resources:</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_infrastructure_management">1.7. Infrastructure management</h3>
+<h3 id="_infrastructure_management">3.7. Infrastructure management</h3>
 <div class="paragraph">
 <p>Terraform was used as this is the preferred GA infrastructure management tool.
 Two git repositories were used to set up separate terraform stacks. One stack was created for ETL, containing "static" task definitions which can be run on demand, and a second for Prez/Fuseki, which defines these as an ECS service, meaning they run continuously as containerised applications on AWS.</p>
@@ -795,7 +1028,7 @@ Two git repositories were used to set up separate terraform stacks. One stack wa
 </div>
 </div>
 <div class="sect1">
-<h2 id="_modelling_ontologies_dataset_and_feature_collection_definitions">2. Modelling, Ontologies, Dataset and Feature Collection definitions</h2>
+<h2 id="_modelling_ontologies_dataset_and_feature_collection_definitions">4. Modelling, Ontologies, Dataset and Feature Collection definitions</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>The FSDF supermodel documentation is in Geoscience Australia&#8217;s Github at <a href="https://geoscienceaustralia.github.io/fsdf-supermodel/supermodel.html">FSDF Supermodel</a>.</p>
@@ -808,7 +1041,7 @@ Two git repositories were used to set up separate terraform stacks. One stack wa
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2022-07-20 00:41:37 UTC
+Last updated 2022-07-26 09:18:18 UTC
 </div>
 </div>
 </body>
