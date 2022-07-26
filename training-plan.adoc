@@ -4,6 +4,67 @@
 
 _This training documentation is automatically built in a *Github Action* and deployed to https://surroundaustralia.github.io/ga-training/training-plan.html - commits to bitbucket will not update the online documentation._
 
+== Architecture
+=== Application and Data
+The following diagram depicts the architecture for data from source to presentation in the various APIs, along with the different configurations currently set up. The source data varies between datasets, and has not been expanded in this diagram. For the Small Datasets, it is a Postgres instance; and for the other datasets it is shapefiles downloaded from government websites, and hosted on S3 buckets.
+
+image::architecture-application-and-data.png[arch-app-data,900,align="center"]
+=== Infrastructure and Automation
+
+The following diagram depicts the architecture from an infrastructure and automation perspective. The six main code repositories used for the project are shown, along with CI pipelines to build and push images to Amazon Elastic Container Registry. The key infrastructure components are shown on the lower half, with boxes showing the Terraform scripts that define these components. EFS is manually mounted first to the ETL processing, then switched to the API instances.
+
+image::architecture-infrastructure-and-automation.png[arch-infra-auto,900,align="center"]
+
+== Dataset overview
+The tables below summarise the Datasets and Feature Collections in FSDF that have been processed, along with counts of Features within these. GNAF, Geofabric, and ASGS have also been included for context.
+
+=== FSDF
+[cols="1,2,3"]
+|===
+|Dataset | Feature Collection | Feature Count
+
+| Facilities | Medical | 7,123
+| Facilities | Emergency Management | 8,901
+| Facilities | Education | 26,403
+| Electrical Infrastructure | Power Substations | 1,101
+| Electrical Infrastructure | Transmission Lines | 2,461
+| Electrical Infrastructure | Power Stations | 536
+| Placenames | Places | 287,338
+|===
+
+=== Other government datasets
+[cols="1,2,3"]
+|===
+|Dataset | Feature Collection | Feature Count
+
+| Australian Statistical Geography Standard (ASGS) Edition 3 | Australia | 2
+| Australian Statistical Geography Standard (ASGS) Edition 3 | States & Territories | 10
+| Australian Statistical Geography Standard (ASGS) Edition 3 | Australian Drainage Divisions | 17
+| Australian Statistical Geography Standard (ASGS) Edition 3 | Greater Capital City Statistical Areas | 35
+| Australian Statistical Geography Standard (ASGS) Edition 3 | Indigenous Regions | 59
+| Australian Statistical Geography Standard (ASGS) Edition 3 | Tourism Regions | 76
+| Australian Statistical Geography Standard (ASGS) Edition 3 | Statistical Areas Level 4 | 108
+| Australian Statistical Geography Standard (ASGS) Edition 3 | Commonwealth Electoral Division 2021 | 170
+| Australian Statistical Geography Standard (ASGS) Edition 3 | Statistical Areas Level 3 | 359
+| Australian Statistical Geography Standard (ASGS) Edition 3 | Indigenous Areas | 431
+| Australian Statistical Geography Standard (ASGS) Edition 3 | State Electoral Division 2021 | 452
+| Australian Statistical Geography Standard (ASGS) Edition 3 | Local Government Area 2021 | 566
+| Australian Statistical Geography Standard (ASGS) Edition 3 | Indigenous Locations | 1,139
+| Australian Statistical Geography Standard (ASGS) Edition 3 | Statistical Areas Level 2 | 2,473
+| Australian Statistical Geography Standard (ASGS) Edition 3 | Postal Area | 2,644
+| Australian Statistical Geography Standard (ASGS) Edition 3 | Destination Zones | 9,329
+| Australian Statistical Geography Standard (ASGS) Edition 3 | Suburbs and Localities | 15,353
+| Australian Statistical Geography Standard (ASGS) Edition 3 | Statistical Areas Level 1 | 61,845
+| Australian Statistical Geography Standard (ASGS) Edition 3 | Mesh Block | 368,286
+| Australian Hydrological Geospatial Fabric | Drainage Divisions | 13
+| Australian Hydrological Geospatial Fabric | River Regions | 219
+| Australian Hydrological Geospatial Fabric | Contracted Catchments | 194,053
+| Geocoded National Address File | Street Locality | 734,292
+| Geocoded National Address File | Address Site | 15,411,809
+| Geocoded National Address File | Addresses | 15,929,362
+
+|===
+
 == ETL processing
 === RDF generation
 
