@@ -4,6 +4,11 @@
 
 _This training documentation is automatically built in a *Github Action* and deployed to https://surroundaustralia.github.io/ga-training/training-plan.html - commits to bitbucket will not update the online documentation._
 
+== Modelling, Ontologies, Dataset and Feature Collection definitions
+The FSDF supermodel documentation is in Geoscience Australia's Github at https://geoscienceaustralia.github.io/fsdf-supermodel/supermodel.html[FSDF Supermodel].
+
+Ontologies, dataset, and feature collection definitions are available in RDF, as turtle, in the https://bitbucket.org/geoscienceaustralia/digital-atlas-etl/src[Digital Atlas ETL repo]. Note the FSDF ontology covers a number of FSDF datasets, which do not require their own ontology.
+
 == Architecture
 === Application and Data
 The following diagram depicts the architecture for data from source to presentation in the various APIs, along with the different configurations currently set up. The source data varies between datasets, and has not been expanded in this diagram. For the Small Datasets, it is a Postgres instance; and for the other datasets it is shapefiles downloaded from government websites, and hosted on S3 buckets.
@@ -191,6 +196,7 @@ Surround has created a docker image which combines the downloading of RDF files 
 
 Jena Fuseki includes both Apache Jena, the triplestore, and Fuseki, the frontend web framework including SPARQL endpoint functionality. The version of Jena Fuseki used includes the GeoSPARQL extension. The image used is based on one provided at https://github.com/zazuko/fuseki-geosparql[Zazuko's Fuseki GeoSPARQL Github repository]. This image simply downloads the relevant Jena binaries and adds them to a docker image. To this image Surround adds a Jena dataset config, and push the resulting image to the https://ap-southeast-2.console.aws.amazon.com/ecr/repositories/private/049648851863/fuseki?region=ap-southeast-2[fuseki ECR repository].
 
+
 === Continuous integration and continuous deployment
 
 - Bitbucket pipelines for application packaging as docker images, and pushing to container registries.
@@ -220,7 +226,11 @@ These repositories are at:
 1. https://bitbucket.org/geoscienceaustralia/da-etl-terraform[Terraform ETL on GA's Bitbucket]
 2. https://bitbucket.org/geoscienceaustralia/da-api-terraform[Terraform API on GA's Bitbucket]
 
-== Modelling, Ontologies, Dataset and Feature Collection definitions
-The FSDF supermodel documentation is in Geoscience Australia's Github at https://geoscienceaustralia.github.io/fsdf-supermodel/supermodel.html[FSDF Supermodel].
+== Provenance
 
-Ontologies, dataset, and feature collection definitions are available in RDF, as turtle, in the https://bitbucket.org/geoscienceaustralia/digital-atlas-etl/src[Digital Atlas ETL repo]. Note the FSDF ontology covers a number of FSDF datasets, which do not require their own ontology.
+A provenance sankey diagram is available at http://sankey-prov-frontend.s3.ap-southeast-2.amazonaws.com/index.html. This provenance application queries a backend Jena Fuseki instance at: http://digital-atlas-lb-1137864764.ap-southeast-2.elb.amazonaws.com:3200/#/. Credentials for the Jena Fuseki instance are provided in the terraform.tfvars file of the https://bitbucket.org/geoscienceaustralia/da-api-terraform[da-api-terraform] repo.
+
+== RDF Validation tools
+
+RDF validation tools are available at http://digital-atlas-lb-1137864764.ap-southeast-2.elb.amazonaws.com:9000/validate. This can be used to validate RDF for conformance against different profiles, including a SpacePrez profile, to determine whether a given dataset will display in SpacePrez.
+
