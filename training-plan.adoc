@@ -20,6 +20,12 @@ The following diagram depicts the architecture from an infrastructure and automa
 
 image::architecture-infrastructure-and-automation.png[arch-infra-auto,900,align="center"]
 
+=== AWS Resources
+
+The following diagram shows the main AWS resources used to deploy the ETL and API components of the solution.
+
+image::architecture-aws-components.png[arch-aws,900,align="center"]
+
 == Dataset overview
 The tables below summarise the Datasets and Feature Collections in FSDF that have been processed, along with counts of Features within these. GNAF, Geofabric, and ASGS have also been included for context.
 
